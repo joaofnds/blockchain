@@ -49,9 +49,9 @@ func (block *Block) CalculateHash() {
 }
 
 func (block *Block) Mine(difficulty int) {
-	target := strings.Repeat("0", difficulty)
+	prefix := strings.Repeat("0", difficulty)
 
-	for !strings.HasPrefix(block.Hash, target) {
+	for !strings.HasPrefix(block.Hash, prefix) {
 		block.Nonce++
 		block.CalculateHash()
 	}
@@ -69,8 +69,4 @@ func NewBlock(data string, prevHash string) *Block {
 	block.CalculateHash()
 
 	return block
-}
-
-func NewGenesisBlock() *Block {
-	return NewBlock("Genesis Block", strings.Repeat("0", 64))
 }

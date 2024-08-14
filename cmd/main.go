@@ -1,15 +1,15 @@
 package main
 
-import "github.com/joaofnds/blockchain/block"
+import (
+	"github.com/joaofnds/blockchain/blockchain"
+)
 
 const difficulty = 2
 
 func main() {
-	b0 := block.NewGenesisBlock()
-	b0.Mine(difficulty)
-	println(b0.String())
-
-	b1 := block.NewBlock("Hello, World!", b0.Hash)
-	b1.Mine(difficulty)
-	println(b1.String())
+	chain := blockchain.Init()
+	chain.AddBlock("Hello, World!")
+	chain.AddBlock("Hello, Blockchain!")
+	chain.AddBlock("Hello, Go!")
+	println(chain.String())
 }
