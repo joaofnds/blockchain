@@ -4,25 +4,37 @@ import (
 	"strings"
 
 	"github.com/joaofnds/blockchain/block"
+	"github.com/joaofnds/blockchain/clock"
+	"github.com/joaofnds/blockchain/mine"
 )
 
 type Blockchain struct {
-	Blocks []*block.Block
+	clock  clock.Clock
+	miner  *mine.Miner
+	blocks []*block.Block
 }
 
-func Init() *Blockchain {
-	blockchain := &Blockchain{}
+func New(clock clock.Clock, miner *mine.Miner) *Blockchain {
+	return &Blockchain{
+		clock:  clock,
+		miner:  miner,
+		blocks: []*block.Block{},
+	}
+}
 
-	genesisBlock := block.NewBlock("Genesis Block", strings.Repeat("0", 64))
-	genesisBlock.Mine(blockchain.Difficulty())
+func (blockchain *Blockchain) AddGenesisBlock() {
+	if blockchain.Len() > 0 {
+		return
+	}
 
-	blockchain.Blocks = []*block.Block{genesisBlock}
+	genesisBlock := block.NewBlock([]byte("Genesis Block"), blockchain.clock.Now(), strings.Repeat("0", 64))
+	blockchain.miner.Mine(genesisBlock, blockchain.Difficulty())
 
-	return blockchain
+	blockchain.blocks = append(blockchain.blocks, genesisBlock)
 }
 
 func (blockchain *Blockchain) Len() int {
-	return len(blockchain.Blocks)
+	return len(blockchain.blocks)
 }
 
 func (blockchain *Blockchain) LastBlock() *block.Block {
@@ -30,7 +42,7 @@ func (blockchain *Blockchain) LastBlock() *block.Block {
 		return nil
 	}
 
-	return blockchain.Blocks[blockchain.Len()-1]
+	return blockchain.blocks[blockchain.Len()-1]
 }
 
 func (blockchain *Blockchain) Difficulty() int {
@@ -39,15 +51,19 @@ func (blockchain *Blockchain) Difficulty() int {
 
 func (blockchain *Blockchain) AddBlock(data string) {
 	prevBlock := blockchain.LastBlock()
-	newBlock := block.NewBlock(data, prevBlock.Hash)
-	newBlock.Mine(blockchain.Difficulty())
-	blockchain.Blocks = append(blockchain.Blocks, newBlock)
+	if prevBlock == nil {
+		return
+	}
+
+	newBlock := block.NewBlock([]byte(data), blockchain.clock.Now(), prevBlock.Hash)
+	blockchain.miner.Mine(newBlock, blockchain.Difficulty())
+	blockchain.blocks = append(blockchain.blocks, newBlock)
 }
 
 func (blockchain *Blockchain) String() string {
 	var str strings.Builder
 
-	for _, block := range blockchain.Blocks {
+	for _, block := range blockchain.blocks {
 		str.WriteString(block.String() + "\n")
 	}
 

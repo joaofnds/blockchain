@@ -2,8 +2,6 @@ package block
 
 import (
 	"bytes"
-	"crypto/sha256"
-	"encoding/hex"
 	"strconv"
 	"strings"
 	"time"
@@ -15,6 +13,24 @@ type Block struct {
 	PrevHash  string
 	Hash      string
 	Nonce     uint64
+}
+
+func NewBlock(data []byte, timestamp time.Time, prevHash string) *Block {
+	return &Block{
+		Data:      data,
+		Timestamp: timestamp,
+		PrevHash:  prevHash,
+		Hash:      "",
+		Nonce:     0,
+	}
+}
+
+func (block *Block) IncNonce() {
+	block.Nonce++
+}
+
+func (block *Block) SetHash(newHash string) {
+	block.Hash = newHash
 }
 
 func (block *Block) Serialize() []byte {
@@ -40,33 +56,4 @@ func (block *Block) String() string {
 	buf.WriteString("}")
 
 	return buf.String()
-}
-
-func (block *Block) CalculateHash() {
-	hash := sha256.New()
-	hash.Write(block.Serialize())
-	block.Hash = hex.EncodeToString(hash.Sum(nil))
-}
-
-func (block *Block) Mine(difficulty int) {
-	prefix := strings.Repeat("0", difficulty)
-
-	for !strings.HasPrefix(block.Hash, prefix) {
-		block.Nonce++
-		block.CalculateHash()
-	}
-}
-
-func NewBlock(data string, prevHash string) *Block {
-	block := &Block{
-		Data:      []byte(data),
-		Timestamp: time.Now(),
-		PrevHash:  prevHash,
-		Hash:      "",
-		Nonce:     0,
-	}
-
-	block.CalculateHash()
-
-	return block
 }
