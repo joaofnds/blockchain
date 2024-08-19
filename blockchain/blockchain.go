@@ -9,16 +9,16 @@ import (
 )
 
 type Blockchain struct {
-	clock  clock.Clock
+	Clock  clock.Clock
 	miner  *mine.Miner
-	blocks []*block.Block
+	Blocks []*block.Block
 }
 
 func New(clock clock.Clock, miner *mine.Miner) *Blockchain {
 	return &Blockchain{
-		clock:  clock,
+		Clock:  clock,
 		miner:  miner,
-		blocks: []*block.Block{},
+		Blocks: []*block.Block{},
 	}
 }
 
@@ -27,14 +27,14 @@ func (blockchain *Blockchain) AddGenesisBlock() {
 		return
 	}
 
-	genesisBlock := block.NewBlock([]byte("Genesis Block"), blockchain.clock.Now(), strings.Repeat("0", 64))
+	genesisBlock := block.NewBlock([]byte("Genesis Block"), blockchain.Clock.Now(), strings.Repeat("0", 64))
 	blockchain.miner.Mine(genesisBlock, blockchain.Difficulty())
 
-	blockchain.blocks = append(blockchain.blocks, genesisBlock)
+	blockchain.Blocks = append(blockchain.Blocks, genesisBlock)
 }
 
 func (blockchain *Blockchain) Len() int {
-	return len(blockchain.blocks)
+	return len(blockchain.Blocks)
 }
 
 func (blockchain *Blockchain) LastBlock() *block.Block {
@@ -42,7 +42,7 @@ func (blockchain *Blockchain) LastBlock() *block.Block {
 		return nil
 	}
 
-	return blockchain.blocks[blockchain.Len()-1]
+	return blockchain.Blocks[blockchain.Len()-1]
 }
 
 func (blockchain *Blockchain) Difficulty() int {
@@ -55,15 +55,15 @@ func (blockchain *Blockchain) AddBlock(data string) {
 		return
 	}
 
-	newBlock := block.NewBlock([]byte(data), blockchain.clock.Now(), prevBlock.Hash)
+	newBlock := block.NewBlock([]byte(data), blockchain.Clock.Now(), prevBlock.Hash)
 	blockchain.miner.Mine(newBlock, blockchain.Difficulty())
-	blockchain.blocks = append(blockchain.blocks, newBlock)
+	blockchain.Blocks = append(blockchain.Blocks, newBlock)
 }
 
 func (blockchain *Blockchain) String() string {
 	var str strings.Builder
 
-	for _, block := range blockchain.blocks {
+	for _, block := range blockchain.Blocks {
 		str.WriteString(block.String() + "\n")
 	}
 

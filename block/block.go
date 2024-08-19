@@ -8,11 +8,11 @@ import (
 )
 
 type Block struct {
-	Data      []byte
-	Timestamp time.Time
-	PrevHash  string
-	Hash      string
-	Nonce     uint64
+	Data      []byte    `json:"Data"`
+	Timestamp time.Time `json:"Timestamp"`
+	PrevHash  string    `json:"PrevHash"`
+	Hash      string    `json:"Hash"`
+	Nonce     uint64    `json:"Nonce"`
 }
 
 func NewBlock(data []byte, timestamp time.Time, prevHash string) *Block {
