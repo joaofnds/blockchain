@@ -8,6 +8,10 @@ import (
 	"github.com/joaofnds/blockchain/mine"
 )
 
+// TODO:
+//   - add `IsValid` to `Blockchain`
+//   - `challenge` interface (takes a block and returns a bool) to be used in `ProofOfWork`
+
 func main() {
 	time := clock.NewTimeClock()
 	miner := mine.New(hash.NewSHA256())

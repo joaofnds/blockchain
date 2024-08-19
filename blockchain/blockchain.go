@@ -49,13 +49,13 @@ func (blockchain *Blockchain) Difficulty() int {
 	return blockchain.Len()/10 + 2
 }
 
-func (blockchain *Blockchain) AddBlock(data string) {
+func (blockchain *Blockchain) AddBlock(data []byte) {
 	prevBlock := blockchain.LastBlock()
 	if prevBlock == nil {
 		return
 	}
 
-	newBlock := block.NewBlock([]byte(data), blockchain.Clock.Now(), prevBlock.Hash)
+	newBlock := block.NewBlock(data, blockchain.Clock.Now(), prevBlock.Hash)
 	blockchain.miner.Mine(newBlock, blockchain.Difficulty())
 	blockchain.Blocks = append(blockchain.Blocks, newBlock)
 }
