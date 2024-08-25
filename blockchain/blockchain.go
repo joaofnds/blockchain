@@ -30,7 +30,7 @@ func (blockchain *Blockchain) AddGenesisBlock() {
 	genesisBlock := block.NewBlock([]byte("Genesis Block"), blockchain.Clock.Now(), strings.Repeat("0", 64))
 	blockchain.miner.Mine(genesisBlock, blockchain.Difficulty())
 
-	blockchain.Blocks = append(blockchain.Blocks, genesisBlock)
+	blockchain.Blocks = append(blockchain.Blocks, &genesisBlock)
 }
 
 func (blockchain *Blockchain) Len() int {
@@ -57,7 +57,7 @@ func (blockchain *Blockchain) AddBlock(data []byte) {
 
 	newBlock := block.NewBlock(data, blockchain.Clock.Now(), prevBlock.Hash)
 	blockchain.miner.Mine(newBlock, blockchain.Difficulty())
-	blockchain.Blocks = append(blockchain.Blocks, newBlock)
+	blockchain.Blocks = append(blockchain.Blocks, &newBlock)
 }
 
 func (blockchain *Blockchain) String() string {

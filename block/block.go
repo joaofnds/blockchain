@@ -15,8 +15,8 @@ type Block struct {
 	Nonce     uint64    `json:"Nonce"`
 }
 
-func NewBlock(data []byte, timestamp time.Time, prevHash string) *Block {
-	return &Block{
+func NewBlock(data []byte, timestamp time.Time, prevHash string) Block {
+	return Block{
 		Data:      data,
 		Timestamp: timestamp,
 		PrevHash:  prevHash,

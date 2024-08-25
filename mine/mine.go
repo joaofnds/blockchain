@@ -15,17 +15,17 @@ func New(hasher hash.Hasher) *Miner {
 	return &Miner{hasher: hasher}
 }
 
-func (miner *Miner) Mine(b *block.Block, difficulty int) {
+func (miner *Miner) Mine(blk block.Block, difficulty int) {
 	prefix := miner.makePrefix(difficulty)
 
-	for !strings.HasPrefix(b.Hash, prefix) {
-		b.IncNonce()
-		b.SetHash(miner.hasher.Hash(b.Serialize()))
+	for !strings.HasPrefix(blk.Hash, prefix) {
+		blk.IncNonce()
+		blk.SetHash(miner.hasher.Hash(blk.Serialize()))
 	}
 }
 
-func (miner *Miner) Validate(b *block.Block, difficulty int) bool {
-	return strings.HasPrefix(b.Hash, miner.makePrefix(difficulty))
+func (miner *Miner) Validate(blk block.Block, difficulty int) bool {
+	return strings.HasPrefix(blk.Hash, miner.makePrefix(difficulty))
 }
 
 func (miner *Miner) makePrefix(size int) string {
