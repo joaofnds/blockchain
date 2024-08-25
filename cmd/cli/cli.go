@@ -17,17 +17,17 @@ func main() {
 	inputFile := flag.String("file", "blockchain.json", "path to the blockchain file")
 	help := flag.Bool("help", false, "print the help message")
 
+	if len(os.Args) < 2 {
+		println("missing command")
+		os.Exit(1)
+	}
+
 	parseErr := flag.CommandLine.Parse(os.Args[2:])
 	assert.Assert(parseErr == nil, "error parsing command line arguments: %v", parseErr)
 
 	if *help {
 		flag.PrintDefaults()
 		os.Exit(0)
-	}
-
-	if len(os.Args) < 2 {
-		println("missing command")
-		os.Exit(1)
 	}
 
 	assertFileExists(*inputFile)
