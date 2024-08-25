@@ -6,6 +6,7 @@ import (
 	"github.com/joaofnds/blockchain/clock"
 	"github.com/joaofnds/blockchain/hash"
 	"github.com/joaofnds/blockchain/mine"
+	"github.com/joaofnds/blockchain/pkg/assert"
 )
 
 // TODO:
@@ -24,7 +25,8 @@ func main() {
 	// chain.AddBlock("Hello, Go!")
 	// jsonStorage.Save(chain)
 
-	jsonStorage.LoadBlocks(chain)
+	loadErr := jsonStorage.LoadBlocks(chain)
+	assert.Assert(loadErr == nil, "failed to load blocks: %v", loadErr)
 
 	println(chain.String())
 }

@@ -10,12 +10,15 @@ import (
 	"github.com/joaofnds/blockchain/clock"
 	"github.com/joaofnds/blockchain/hash"
 	"github.com/joaofnds/blockchain/mine"
+	"github.com/joaofnds/blockchain/pkg/assert"
 )
 
 func main() {
 	inputFile := flag.String("file", "blockchain.json", "path to the blockchain file")
 	help := flag.Bool("help", false, "print the help message")
-	flag.CommandLine.Parse(os.Args[2:])
+
+	parseErr := flag.CommandLine.Parse(os.Args[2:])
+	assert.Assert(parseErr == nil, "error parsing command line arguments: %v", parseErr)
 
 	if *help {
 		flag.PrintDefaults()
@@ -34,7 +37,8 @@ func main() {
 	chain := blockchain.New(time, miner)
 
 	jsonStorage := storage.NewJSON(*inputFile)
-	jsonStorage.LoadBlocks(chain)
+	loadErr := jsonStorage.LoadBlocks(chain)
+	assert.Assert(loadErr == nil, "failed to load blocks: %v", loadErr)
 
 	command := os.Args[1]
 	switch command {
