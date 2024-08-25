@@ -25,14 +25,6 @@ func NewBlock(data []byte, timestamp time.Time, prevHash string) Block {
 	}
 }
 
-func (block *Block) IncNonce() {
-	block.Nonce++
-}
-
-func (block *Block) SetHash(newHash string) {
-	block.Hash = newHash
-}
-
 func (block *Block) Serialize() []byte {
 	var buf bytes.Buffer
 

@@ -1,6 +1,8 @@
 package mine
 
 import (
+	"bytes"
+	"strconv"
 	"strings"
 
 	"github.com/joaofnds/blockchain/block"
@@ -16,11 +18,21 @@ func New(hasher hash.Hasher) *Miner {
 }
 
 func (miner *Miner) Mine(blk block.Block, difficulty int) {
+	var buf bytes.Buffer
+	buf.Write(blk.Data)
+	buf.WriteString(blk.PrevHash)
+	buf.WriteString(blk.Timestamp.String())
+	lenBeforeNonce := buf.Len()
+
 	prefix := miner.makePrefix(difficulty)
 
 	for !strings.HasPrefix(blk.Hash, prefix) {
-		blk.IncNonce()
-		blk.SetHash(miner.hasher.Hash(blk.Serialize()))
+		blk.Nonce++
+
+		buf.Truncate(lenBeforeNonce)
+		buf.WriteString(strconv.FormatUint(blk.Nonce, 10))
+
+		blk.Hash = miner.hasher.Hash(buf.Bytes())
 	}
 }
 
