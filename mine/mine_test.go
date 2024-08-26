@@ -35,3 +35,48 @@ func BenchmarkMineSeq(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkConcurrent(b *testing.B) {
+	now, _ := time.Parse(time.RFC3339, "2021-01-01T00:00:00Z")
+	clock := clock.NewFixedClock(now)
+	miner := mine.NewConcurrent(hash.NewSHA256())
+	chain := blockchain.New(clock, miner)
+	chain.AddGenesisBlock()
+
+	blk := block.NewBlock([]byte{}, clock.Now(), chain.LastBlock().Hash)
+
+	for difficulty := minDifficulty; difficulty <= maxDifficulty; difficulty++ {
+		b.Run(fmt.Sprintf("difficulty %d", difficulty), func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				miner.Mine(&blk, difficulty)
+			}
+		})
+	}
+}
+
+func TestSeq(t *testing.T) {
+	now, _ := time.Parse(time.RFC3339, "2021-01-01T00:00:00Z")
+	clock := clock.NewFixedClock(now)
+	miner := mine.NewSeq(hash.NewSHA256())
+	chain := blockchain.New(clock, miner)
+	chain.AddGenesisBlock()
+
+	blk := block.NewBlock([]byte{}, clock.Now(), chain.LastBlock().Hash)
+
+	miner.Mine(&blk, maxDifficulty)
+	println(blk.String())
+}
+
+func TestConcurrent(t *testing.T) {
+	now, _ := time.Parse(time.RFC3339, "2021-01-01T00:00:00Z")
+	clock := clock.NewFixedClock(now)
+	miner := mine.NewConcurrent(hash.NewSHA256())
+	chain := blockchain.New(clock, miner)
+	chain.AddGenesisBlock()
+
+	blk := block.NewBlock([]byte{}, clock.Now(), chain.LastBlock().Hash)
+
+	miner.Mine(&blk, maxDifficulty)
+	println(blk.String())
+}
