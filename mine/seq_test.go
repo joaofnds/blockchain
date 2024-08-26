@@ -12,7 +12,7 @@ import (
 	"github.com/joaofnds/blockchain/mine"
 )
 
-func BenchmarkMineSeq(b *testing.B) {
+func BenchmarkSeq(b *testing.B) {
 	now, _ := time.Parse(time.RFC3339, "2021-01-01T00:00:00Z")
 	clock := clock.NewFixedClock(now)
 	miner := mine.NewSeq(hash.NewSHA256())

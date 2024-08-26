@@ -31,7 +31,7 @@ func BenchmarkConcurrent(b *testing.B) {
 	}
 }
 
-func TestConcurrentWithDifficulty7(t *testing.T) {
+func TestConcurrent(t *testing.T) {
 	now, _ := time.Parse(time.RFC3339, "2021-01-01T00:00:00Z")
 	clock := clock.NewFixedClock(now)
 	miner := mine.NewConcurrent(hash.NewSHA256())
