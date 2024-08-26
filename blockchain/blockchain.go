@@ -10,11 +10,11 @@ import (
 
 type Blockchain struct {
 	Clock  clock.Clock
-	miner  *mine.Miner
+	miner  mine.Miner
 	Blocks []*block.Block
 }
 
-func New(clock clock.Clock, miner *mine.Miner) *Blockchain {
+func New(clock clock.Clock, miner mine.Miner) *Blockchain {
 	return &Blockchain{
 		Clock:  clock,
 		miner:  miner,
@@ -28,7 +28,7 @@ func (blockchain *Blockchain) AddGenesisBlock() {
 	}
 
 	genesisBlock := block.NewBlock([]byte("Genesis Block"), blockchain.Clock.Now(), strings.Repeat("0", 64))
-	blockchain.miner.Mine(genesisBlock, blockchain.Difficulty())
+	blockchain.miner.Mine(&genesisBlock, blockchain.Difficulty())
 
 	blockchain.Blocks = append(blockchain.Blocks, &genesisBlock)
 }
@@ -56,7 +56,7 @@ func (blockchain *Blockchain) AddBlock(data []byte) {
 	}
 
 	newBlock := block.NewBlock(data, blockchain.Clock.Now(), prevBlock.Hash)
-	blockchain.miner.Mine(newBlock, blockchain.Difficulty())
+	blockchain.miner.Mine(&newBlock, blockchain.Difficulty())
 	blockchain.Blocks = append(blockchain.Blocks, &newBlock)
 }
 

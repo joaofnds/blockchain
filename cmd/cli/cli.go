@@ -33,7 +33,7 @@ func main() {
 	assertFileExists(*inputFile)
 
 	time := clock.NewTimeClock()
-	miner := mine.New(hash.NewSHA256())
+	miner := mine.NewSeq(hash.NewSHA256())
 	chain := blockchain.New(time, miner)
 
 	jsonStorage := storage.NewJSON(*inputFile)
