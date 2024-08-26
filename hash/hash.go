@@ -17,9 +17,7 @@ func NewSHA256() *SHA256Hasher {
 	return &SHA256Hasher{}
 }
 
-func (_ *SHA256Hasher) Hash(data []byte) string {
-	h := sha256.New()
-	h.Write(data)
-	sum := h.Sum(nil)
-	return hex.EncodeToString(sum)
+func (hasher *SHA256Hasher) Hash(data []byte) string {
+	sum := sha256.Sum256(data)
+	return hex.EncodeToString(sum[:])
 }
