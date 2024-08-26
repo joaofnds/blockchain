@@ -4,7 +4,6 @@ import (
 	"runtime"
 	"strconv"
 	"sync"
-	"sync/atomic"
 
 	"github.com/joaofnds/blockchain/block"
 	"github.com/joaofnds/blockchain/hash"
@@ -25,37 +24,68 @@ func NewConcurrent(hasher hash.Hasher) *Concurrent {
 }
 
 func (miner *Concurrent) Mine(blk *block.Block, difficulty int) {
+	const batchSize = 10_000_000
 	var nonce uint64
-	var found int32 = 0
 
 	prefix := hashPrefix(difficulty)
 
-	var wg sync.WaitGroup
-	wg.Add(miner.numWorkers)
+	nonceChan := make(chan uint64)
+	resultChan := make(chan struct{}, 1)
+	doneChan := make(chan struct{})
+
+	var once sync.Once
+
 	for i := 0; i < miner.numWorkers; i++ {
 		go func() {
-			defer wg.Done()
-
 			buf := preNonceBuffer(blk)
 			lenBeforeNonce := buf.Len()
 
-			for atomic.LoadInt32(&found) == 0 {
-				localNonce := atomic.AddUint64(&nonce, 1)
-
-				buf.Truncate(lenBeforeNonce)
-				buf.WriteString(strconv.FormatUint(localNonce, 10))
-				hash := miner.hasher.Hash(buf.Bytes())
-
-				if hasPrefix(hash, prefix) {
-					if atomic.CompareAndSwapInt32(&found, 0, 1) {
-						blk.Hash = hash
-						blk.Nonce = localNonce
+			for {
+				select {
+				case startNonce, ok := <-nonceChan:
+					if !ok {
+						return
 					}
-					break
+					for localNonce := startNonce; localNonce < startNonce+batchSize; localNonce++ {
+						buf.Truncate(lenBeforeNonce)
+						buf.WriteString(strconv.FormatUint(localNonce, 10))
+						hash := miner.hasher.Hash(buf.Bytes())
+
+						if hasPrefix(hash, prefix) {
+							select {
+							case resultChan <- struct{}{}:
+								blk.Nonce = localNonce
+								blk.Hash = hash
+								once.Do(func() { close(doneChan) })
+							case <-doneChan:
+							}
+							return
+						}
+
+						select {
+						case <-doneChan:
+							return
+						default:
+						}
+					}
+				case <-doneChan:
+					return
 				}
 			}
 		}()
 	}
 
-	wg.Wait()
+	go func() {
+		for {
+			select {
+			case nonceChan <- nonce:
+				nonce += batchSize
+			case <-doneChan:
+				close(nonceChan)
+				return
+			}
+		}
+	}()
+
+	<-resultChan
 }
