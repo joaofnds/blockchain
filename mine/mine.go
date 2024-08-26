@@ -24,7 +24,7 @@ func hasPrefix(s, prefix string) bool {
 	return len(s) >= len(prefix) && s[0:len(prefix)] == prefix
 }
 
-func preNonceBuffer(blk block.Block) bytes.Buffer {
+func preNonceBuffer(blk *block.Block) bytes.Buffer {
 	var buf bytes.Buffer
 
 	buf.Write(blk.Data)

@@ -18,7 +18,7 @@ func NewSeq(hasher hash.Hasher) *SeqMiner {
 }
 
 func (miner *SeqMiner) Mine(blk *block.Block, difficulty int) {
-	buf := preNonceBuffer(*blk)
+	buf := preNonceBuffer(blk)
 	lenBeforeNonce := buf.Len()
 
 	prefix := hashPrefix(difficulty)
