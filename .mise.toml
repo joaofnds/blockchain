@@ -3,4 +3,5 @@ golang = "1.23.0"
 golangci-lint = "1.60.3"
 
 [tasks]
+build = "go build ./cmd/cli/cli.go"
 lint = "golangci-lint run"
