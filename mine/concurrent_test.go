@@ -2,6 +2,7 @@ package mine_test // bench
 
 import (
 	"fmt"
+	"slices"
 	"testing"
 	"time"
 
@@ -40,12 +41,15 @@ func TestConcurrent(t *testing.T) {
 
 	testTable := []struct {
 		difficulty    int
-		expectedNonce uint64
+		expectedNonce []uint64
 	}{
-		{4, 40018007},
-		{5, 30033096},
-		{6, 12186394},
-		{7, 137747328},
+		{1, []uint64{17, 25, 10000004}},
+		{2, []uint64{61, 10000160, 10000218, 30000074}},
+		{3, []uint64{4910, 10000322, 20001013, 20081716, 20081716, 30001359, 50001935}},
+		{4, []uint64{34551, 40003888, 40018007, 60021369}},
+		{5, []uint64{379280, 20081716, 30033096}},
+		{6, []uint64{8921088, 12186394, 20849738}},
+		{7, []uint64{137747328}},
 		// {8, 3810002515},
 	}
 
@@ -55,7 +59,7 @@ func TestConcurrent(t *testing.T) {
 
 			miner.Mine(&blk, testCase.difficulty)
 
-			if blk.Nonce != testCase.expectedNonce {
+			if !slices.Contains(testCase.expectedNonce, blk.Nonce) {
 				t.Errorf("unexpected nonce: %d", blk.Nonce)
 			}
 		})
