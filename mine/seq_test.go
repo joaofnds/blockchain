@@ -48,6 +48,8 @@ func TestSeq(t *testing.T) {
 		{4, 34551},
 		{5, 379280},
 		{6, 8921088},
+		{7, 137747328},
+		// {8, 3810002515},
 	}
 
 	for _, testCase := range testTable {
