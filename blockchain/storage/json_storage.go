@@ -18,7 +18,7 @@ func NewJSON(path string) JSONStorage {
 }
 
 func (jsonStorage JSONStorage) Save(chain *blockchain.Blockchain) error {
-	bytes, marshalErr := json.Marshal(chain.Blocks)
+	bytes, marshalErr := json.MarshalIndent(chain.Blocks, "", "  ")
 	if marshalErr != nil {
 		return marshalErr
 	}
