@@ -1,7 +1,6 @@
 package block
 
 import (
-	"bytes"
 	"strconv"
 	"strings"
 	"time"
@@ -23,17 +22,6 @@ func NewBlock(data []byte, timestamp time.Time, prevHash string) Block {
 		Hash:      "",
 		Nonce:     0,
 	}
-}
-
-func (block *Block) Serialize() []byte {
-	var buf bytes.Buffer
-
-	buf.Write(block.Data)
-	buf.WriteString(block.PrevHash)
-	buf.WriteString(block.Timestamp.String())
-	buf.WriteString(strconv.FormatUint(block.Nonce, 10))
-
-	return buf.Bytes()
 }
 
 func (block *Block) String() string {
