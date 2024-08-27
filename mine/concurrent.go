@@ -2,7 +2,6 @@ package mine
 
 import (
 	"runtime"
-	"strconv"
 	"sync/atomic"
 
 	"github.com/joaofnds/blockchain/block"
@@ -34,8 +33,7 @@ func (miner *Concurrent) Mine(blk *block.Block, difficulty int) {
 	for i := 0; i < miner.numWorkers; i++ {
 		go func() {
 
-			buf := preNonceBuffer(blk)
-			lenBeforeNonce := buf.Len()
+			serialize := blockSerializer(blk)
 
 			for {
 				startNonce := atomic.AddUint64(&nonce, miner.batchSize) - miner.batchSize
@@ -45,9 +43,7 @@ func (miner *Concurrent) Mine(blk *block.Block, difficulty int) {
 					case <-found:
 						return
 					default:
-						buf.Truncate(lenBeforeNonce)
-						buf.WriteString(strconv.FormatUint(localNonce, 10))
-						hash := miner.hasher.Hash(buf.Bytes())
+						hash := miner.hasher.Hash(serialize(localNonce))
 
 						if hasPrefix(hash, prefix) {
 							close(found)

@@ -1,8 +1,6 @@
 package mine
 
 import (
-	"strconv"
-
 	"github.com/joaofnds/blockchain/block"
 	"github.com/joaofnds/blockchain/hash"
 )
@@ -18,17 +16,12 @@ func NewSeq(hasher hash.Hasher) *SeqMiner {
 }
 
 func (miner *SeqMiner) Mine(blk *block.Block, difficulty int) {
-	buf := preNonceBuffer(blk)
-	lenBeforeNonce := buf.Len()
+	serialize := blockSerializer(blk)
 
 	prefix := hashPrefix(difficulty)
 
 	for !hasPrefix(blk.Hash, prefix) {
 		blk.Nonce++
-
-		buf.Truncate(lenBeforeNonce)
-		buf.WriteString(strconv.FormatUint(blk.Nonce, 10))
-
-		blk.Hash = miner.hasher.Hash(buf.Bytes())
+		blk.Hash = miner.hasher.Hash(serialize(blk.Nonce))
 	}
 }

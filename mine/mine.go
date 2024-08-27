@@ -2,6 +2,7 @@ package mine
 
 import (
 	"bytes"
+	"strconv"
 
 	"github.com/joaofnds/blockchain/block"
 )
@@ -24,12 +25,17 @@ func hasPrefix(s, prefix string) bool {
 	return len(s) >= len(prefix) && s[0:len(prefix)] == prefix
 }
 
-func preNonceBuffer(blk *block.Block) bytes.Buffer {
+func blockSerializer(blk *block.Block) func(uint64) []byte {
 	var buf bytes.Buffer
 
 	buf.Write(blk.Data)
 	buf.WriteString(blk.PrevHash)
 	buf.WriteString(blk.Timestamp.String())
+	lenBeforeNonce := buf.Len()
 
-	return buf
+	return func(nonce uint64) []byte {
+		buf.Truncate(lenBeforeNonce)
+		buf.WriteString(strconv.FormatUint(nonce, 10))
+		return buf.Bytes()
+	}
 }
