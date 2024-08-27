@@ -2,6 +2,7 @@ package mine
 
 import (
 	"runtime"
+	"sync"
 	"sync/atomic"
 
 	"github.com/joaofnds/blockchain/block"
@@ -30,6 +31,8 @@ func (miner *Concurrent) Mine(blk *block.Block, difficulty int) {
 
 	prefix := hashPrefix(difficulty)
 
+	var once sync.Once
+
 	for i := 0; i < miner.numWorkers; i++ {
 		go func() {
 
@@ -46,7 +49,7 @@ func (miner *Concurrent) Mine(blk *block.Block, difficulty int) {
 						hash := miner.hasher.Hash(serialize(localNonce))
 
 						if hasPrefix(hash, prefix) {
-							close(found)
+							once.Do(func() { close(found) })
 							blk.Hash = hash
 							blk.Nonce = localNonce
 							return
